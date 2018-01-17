@@ -2,7 +2,7 @@
   "name": "deepminer",
   "version": "1.0.2",
   "description": "deepminer",
-  "repository": "https://github.com/deepwn/deepMiner",
+  "repository": "https://github.com/gotoco/deepMiner",
   "main": "cluster.js",
   "dependencies": {
     "ws": "^3.3.3"

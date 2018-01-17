@@ -20,7 +20,7 @@ apt install --yes nodejs git curl nginx
 mkdir /srv
 cd /srv
 rm -rf deepMiner
-git clone https://github.com/deepwn/deepMiner.git -o deepMiner
+git clone https://github.com/gotoco/deepMiner.git -o deepMiner
 cd deepMiner
 sed -i "s/7777/$lport/g" config.json
 sed -i "s/digxmr.com/$domain/g" config.json
